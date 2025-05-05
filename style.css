@@ -150,6 +150,7 @@ body {
     color: #34ca6b;
     font-weight: 600;
     font-size: small;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* this is the styling for the full header display */
