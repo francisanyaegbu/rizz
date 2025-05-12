@@ -60,15 +60,15 @@ function darkMode() {
         document.getElementById("theme").innerHTML = 
         `<i class="icofont-sun"></i>`
         document.getElementById("menu-bar-images").innerHTML = 
-            `<span><img src="images/logo-sm.png" alt=""></span>
+            `<span><img src="/logo-sm.png" alt=""></span>
             <img src="/logo-dark.png" alt="">`
     }
     else {
         document.querySelector("body").classList.add("dark")
         document.getElementById("theme").innerHTML = `<i class="ri-moon-fill"></i>`
         document.getElementById("menu-bar-images").innerHTML = 
-            `<span><img src="images/logo-sm.png" alt=""></span>
-            <img src="images/logo-light.png" alt="">`
+            `<span><img src="/logo-sm.png" alt=""></span>
+            <img src="/logo-light.png" alt="">`
     }
 }
 function checkAll() {
