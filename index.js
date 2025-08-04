@@ -164,10 +164,11 @@ window.addEventListener("load", function(e) {
     const data = [
         {
             product_name: "Sophisticated Swagger Suit",
-            product_price: "$1200",
+            product_price: "1200",
             product_quantity: 10,
             product_category: "Hats",
             customer_email: "francis@gmail.com",
+            product_image: "images/placeholder.png"
         }
     ]
     let productData = localStorage.getItem("productData");
@@ -179,6 +180,7 @@ window.addEventListener("load", function(e) {
     const productTable = document.querySelector("#details-content tbody");
     productDataParse.forEach(item => {
         const tr = document.createElement("tr");
+        // When creating each row in your table:
         tr.innerHTML = `
             <td>
                 <label>
@@ -186,7 +188,10 @@ window.addEventListener("load", function(e) {
                     <span id="check-mark"></span>
                 </label>
             </td>
-            <td>${item.product_name}</td>
+            <td>
+                <img src="${item.product_image || 'images/placeholder.png'}" alt="Product" style="width:40px;height:40px;object-fit:cover;border-radius:6px;margin-right:8px;">
+                ${item.product_name}
+            </td>
             <td>${item.product_price}</td>
             <td>${item.product_quantity}</td>
             <td>${item.product_category}</td>
@@ -230,48 +235,59 @@ function showSuccessMessage(message) {
 
 let editingProductEmail = null;
 
-function addNewProduct() {
+
+async function uploadToCloudinary(file) {
+    const url = `https://api.cloudinary.com/v1_1/drpu2ycu6/image/upload`;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'myUpload'); // Create this in your Cloudinary dashboard
+
+    const response = await fetch(url, {
+        method: 'POST',
+        body: formData
+    });
+    const data = await response.json();
+    return data.secure_url; // This is the image URL
+}
+
+async function addNewProduct() {
     const productName = document.getElementsByName("product_name")[0].value;
     const productPrice = document.getElementsByName("product_price")[0].value;
     const productQty = document.getElementsByName("product_quantity")[0].value;
     const productCategory = document.getElementsByName("product_category")[0].value;
     const customerEmail = document.getElementsByName("customer_email")[0].value;
+    const productImageInput = document.getElementsByName("product_image")[0];
+    const productImageFile = productImageInput && productImageInput.files[0];
 
-    if (productName && productPrice && productQty && productCategory && customerEmail) {
-        let productData = localStorage.getItem("productData");
-        productData = productData ? JSON.parse(productData) : [];
+    if (productName && productPrice && productQty && productCategory && customerEmail && productImageFile) {
+        try {
+            const imageUrl = await uploadToCloudinary(productImageFile);
 
-        if (editingProductEmail) {
-            productData = productData.map(item =>
-                item.customer_email === editingProductEmail
-                    ? {
-                        product_name: productName,
-                        product_price: productPrice,
-                        product_quantity: productQty,
-                        product_category: productCategory,
-                        customer_email: customerEmail
-                    }
-                    : item
-            );
-            showSuccessMessage("Product details updated successfully!");
-            editingProductEmail = null;
-        } else {
+            // Now use imageUrl as your product_image
+            let productData = localStorage.getItem("productData");
+            productData = productData ? JSON.parse(productData) : [];
             const newProduct = {
                 product_name: productName,
                 product_price: productPrice,
                 product_quantity: productQty,
                 product_category: productCategory,
-                customer_email: customerEmail
+                customer_email: customerEmail,
+                product_image: imageUrl
             };
             productData.unshift(newProduct);
+            localStorage.setItem("productData", JSON.stringify(productData));
+
             showSuccessMessage("Product added successfully!");
+            setTimeout(() => window.location.reload(), 1000);
+        } catch (err) {
+            showAlertMessage("Image upload failed. Please try again.");
         }
-        localStorage.setItem("productData", JSON.stringify(productData));
-        setTimeout(() => window.location.reload(), 1000);
     } else {
-        showAlertMessage("Please fill in all fields before adding a product.");
+        showAlertMessage("Please fill in all fields and select an image.");
     }
 }
+
+
 
 function showAlertMessage(message) {
     const oldAlert = document.getElementById("alert-message");
@@ -374,8 +390,8 @@ function editProductDetails(email) {
     const modal = document.querySelector(".add-new");
     modal.classList.add("slidein");
     modal.classList.remove("slideout");
-    if (modal.classList.contains("slidein")) {
-        document.getElementById("main-display").style.filter = "blur(1.5px)";
-    }
-    editingProductEmail = email;
+    document.getElementById("main-display").style.filter = "blur(1.5px)";
 }
+
+// After showSuccessMessage and before reload:
+document.querySelector(".add-new form").reset();
