@@ -163,12 +163,12 @@ document.addEventListener("DOMContentLoaded", function() {
 window.addEventListener("load", function(e) {
     const data = [
         {
-            product_name: "Sophisticated Swagger Suit",
-            product_price: "1200",
-            product_quantity: 10,
-            product_category: "Hats",
-            customer_email: "francis@gmail.com",
-            product_image: "images/placeholder.png"
+            product_name: "",
+            product_price: "",
+            product_quantity: "",
+            product_category: "",
+            customer_email: "",
+            product_image: ""
         }
     ]
     let productData = localStorage.getItem("productData");
@@ -192,7 +192,7 @@ window.addEventListener("load", function(e) {
                 <img src="${item.product_image || 'images/placeholder.png'}" alt="Product" style="width:40px;height:40px;object-fit:cover;border-radius:6px;margin-right:8px;">
                 ${item.product_name}
             </td>
-            <td>${item.product_price}</td>
+            <td>${"$"}${item.product_price}</td>
             <td>${item.product_quantity}</td>
             <td>${item.product_category}</td>
             <td>${item.customer_email}</td>
